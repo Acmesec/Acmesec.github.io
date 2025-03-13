@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI迷思录 - 应用与安全指南</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3B82F6;
+            --secondary-color: #1E40AF;
+            --accent-color: #DBEAFE;
+            --text-color: #1F2937;
+            --background-color: #F9FAFB;
+            --card-color: #FFFFFF;
+            --border-color: #E5E7EB;
+        }
+        
+        /* 深色模式暂时注释，待样式问题解决后再启用 
+        .dark {
+            --primary-color: #60A5FA;
+            --secondary-color: #93C5FD;
+            --accent-color: #1E3A8A;
+            --text-color: #F9FAFB;
+            --background-color: #111827;
+            --card-color: #1F2937;
+            --border-color: #374151;
+        }
+        */
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            font-family: "Inter", system-ui, -apple-system, sans-serif;
+        }
+        
+        .card {
+            background-color: var(--card-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .section-title {
+            color: var(--primary-color);
+            border-left: 4px solid var(--primary-color);
+            padding-left: 1rem;
+        }
+        
+        .nav-item {
+            transition: all 0.2s ease;
+        }
+        
+        .nav-item:hover {
+            color: var(--primary-color);
+        }
+        
+        .btn {
+            transition: all 0.2s ease;
+        }
+        
+        .btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.8s ease-in-out forwards;
+            opacity: 0;
+        }
+        
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Different animation delays for staggered effect */
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+        .delay-5 { animation-delay: 0.5s; }
+        
+        /* Timeline styling */
+        .timeline-container {
+            position: relative;
+        }
+        
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            width: 2px;
+            background-color: var(--primary-color);
+            top: 0;
+            bottom: 0;
+            left: 1.5rem;
+        }
+        
+        .timeline-item {
+            margin-left: 3rem;
+            position: relative;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            width: 1rem;
+            height: 1rem;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            left: -2.25rem;
+            top: 0.5rem;
+        }
+        
+        /* Table styling */
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .custom-table th {
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            font-weight: 600;
+            text-align: left;
+            padding: 0.75rem 1rem;
+        }
+        
+        .custom-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .custom-table tr:hover {
+            background-color: var(--accent-color);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-opacity-90 backdrop-filter backdrop-blur-lg" style="background-color: var(--card-color);">
+        <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+            <a href="#" class="flex items-center space-x-2">
+                <i class="fas fa-brain text-3xl" style="color: var(--primary-color);"></i>
+                <span class="text-xl font-bold">AI迷思录</span>
+            </a>
+            
+            <nav class="hidden md:flex space-x-8">
+                <a href="#intro" class="nav-item font-medium">绪论</a>
+                <a href="#learning-path" class="nav-item font-medium">学习路径</a>
+                <a href="#llm-overview" class="nav-item font-medium">大模型概览</a>
+                <a href="#security" class="nav-item font-medium">安全工程</a>
+                <a href="#legal" class="nav-item font-medium">法律法规</a>
+            </nav>
+            
+            <div class="flex items-center space-x-4">
+                <!-- 深色模式切换按钮暂时注释
+                <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200">
+                    <i class="fas fa-moon" style="color: var(--secondary-color);"></i>
+                </button>
+                -->
+                
+                <button class="md:hidden focus:outline-none" id="mobile-menu-button">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden" style="background-color: var(--card-color);">
+            <div class="container mx-auto px-4 py-3 space-y-2">
+                <a href="#intro" class="block py-2 nav-item">绪论</a>
+                <a href="#learning-path" class="block py-2 nav-item">学习路径</a>
+                <a href="#llm-overview" class="block py-2 nav-item">大模型概览</a>
+                <a href="#security" class="block py-2 nav-item">安全工程</a>
+                <a href="#legal" class="block py-2 nav-item">法律法规</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero section -->
+    <section class="py-20 px-4 text-center" style="background-color: var(--background-color);">
+        <div class="container mx-auto max-w-5xl fade-in">
+            <h1 class="text-4xl md:text-5xl font-bold mb-6" style="color: var(--primary-color);">AI迷思录</h1>
+            <h2 class="text-2xl md:text-3xl font-semibold mb-6">应用与安全指南</h2>
+            <p class="text-lg md:text-xl mb-10 max-w-3xl mx-auto">
+                本指南旨在帮助零基础读者成为实战型 AI 安全专家。内容涵盖基础知识、法规、AI 模型、安全漏洞与防御、开发运维、框架工具及技能等级，为各层级学习者提供资源和建议。
+            </p>
+            <a href="#intro" class="btn inline-block px-8 py-3 rounded-lg font-medium text-white" style="background-color: var(--primary-color);">
+                开始学习 <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+        </div>
+    </section>
+
+    <!-- Quick navigation -->
+    <section class="py-10 px-4" style="background-color: var(--card-color);">
+        <div class="container mx-auto max-w-6xl">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="card p-6 text-center fade-in delay-1">
+                    <i class="fas fa-book-open text-4xl mb-4" style="color: var(--primary-color);"></i>
+                    <h3 class="text-xl font-semibold mb-3">基础知识</h3>
+                    <p class="mb-4">掌握网络安全基础和AI数学概念，了解AI关键技术和硬件平台</p>
+                    <a href="#basics" class="font-medium" style="color: var(--primary-color);">查看详情 →</a>
+                </div>
+                
+                <div class="card p-6 text-center fade-in delay-2">
+                    <i class="fas fa-shield-alt text-4xl mb-4" style="color: var(--primary-color);"></i>
+                    <h3 class="text-xl font-semibold mb-3">安全挑战</h3>
+                    <p class="mb-4">探索AI漏洞与攻击，掌握有效防御技术，应对越狱和数据投毒</p>
+                    <a href="#security-challenges" class="font-medium" style="color: var(--primary-color);">查看详情 →</a>
+                </div>
+                
+                <div class="card p-6 text-center fade-in delay-3">
+                    <i class="fas fa-code text-4xl mb-4" style="color: var(--primary-color);"></i>
+                    <h3 class="text-xl font-semibold mb-3">实践应用</h3>
+                    <p class="mb-4">学习安全开发与MLOps，掌握Prompt工程与AI安全框架工具</p>
+                    <a href="#practice" class="font-medium" style="color: var(--primary-color);">查看详情 →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main content -->
+    <main class="container mx-auto px-4 py-16 max-w-6xl">
+        <!-- Introduction -->
+        <section id="intro" class="mb-20 fade-in">
+            <h2 class="section-title text-3xl font-bold mb-8">第一卷：绪论</h2>
+            
+            <div class="card p-8 mb-10">
+                <h3 class="text-2xl font-semibold mb-4">序言 - 炼丹道术之说</h3>
+                <p class="mb-4">本文旨在追溯 AI 大模型发展，探究其缘起、设计构想、运行机制和安全演进。目标是"道"（机制）与"术"（应用）融会贯通，理解模型边界和技术奥秘。</p>
+                
+                <div class="bg-blue-50 dark:bg-blue-900 p-6 rounded-lg mb-6">
+                    <p class="italic">当前 Prompt 工程实践常侧重表层技巧，忽略模型底层机制。Prompt 最初旨在通过指令微调提升模型指令理解力。Prompt 工程关键在于 Prompt 如何契合模型逻辑，精准命中模板，激发模型能力（MoE）。理解模型机制是 Prompt 应用的核心。</p>
+                </div>
+                
+                <h4 class="text-xl font-semibold mb-3">Prompt 与 AI 模型类比"炼丹术"：</h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="card p-4">
+                        <div class="flex items-center mb-3">
+                            <i class="fas fa-flask text-2xl mr-3" style="color: var(--primary-color);"></i>
+                            <h5 class="font-semibold">Prompt（灵药）</h5>
+                        </div>
+                        <p>指引模型输出的关键信息，质量决定输出优劣。</p>
+                    </div>
+                    
+                    <div class="card p-4">
+                        <div class="flex items-center mb-3">
+                            <i class="fas fa-fire text-2xl mr-3" style="color: var(--primary-color);"></i>
+                            <h5 class="font-semibold">算法框架（控火）</h5>
+                        </div>
+                        <p>选择和调控算法，如 GPT/BERT、GNN、T5，精细调控参数。</p>
+                    </div>
+                    
+                    <div class="card p-4">
+                        <div class="flex items-center mb-3">
+                            <i class="fas fa-cauldron text-2xl mr-3" style="color: var(--primary-color);"></i>
+                            <h5 class="font-semibold">模型架构（炉鼎）</h5>
+                        </div>
+                        <p>决定模型处理数据类型和复杂度，如RNN/LSTM、CNN、Transformer。</p>
+                    </div>
+                </div>
+                
+                <p>AI 输出依赖 Prompt、算法机制和模型架构协同。炼丹术需灵药、火候、炉鼎结合，AI 成功亦仰赖三者平衡与协同。训练 AI 乃至越狱，亦是如此。</p>
+            </div>
+        </section>
+
+        <!-- Learning Path -->
+        <section id="learning-path" class="mb-20 fade-in">
+            <h2 class="section-title text-3xl font-bold mb-8">AI安全学习路径</h2>
+            
+            <div class="card p-8 mb-10">
+                <p class="mb-6 text-lg italic font-medium">扎实的网络安全基础和对 AI 数学、概念的理解是 AI 安全学习的基石。</p>
+                
+                <h3 id="basics" class="text-2xl font-semibold mb-4">一、基础知识</h3>
+                
+                <div class="ml-4 mb-8">
+                    <div class="mb-6">
+                        <h4 class="text-xl font-medium mb-2 flex items-center">
+                            <i class="fas fa-shield-alt mr-2" style="color: var(--primary-color);"></i>
+                            传统网络安全基础
+                        </h4>
+                        <ul class="list-disc ml-8 space-y-2">
+                            <li>理解常见网络威胁（恶意软件、入侵等）。</li>
+                            <li>认识传统网络安全与 AI 安全的区别（威胁复杂性、攻击面、威胁适应性、可解释性、数据隐私、监管合规、伦理考量）。</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <h4 class="text-xl font-medium mb-2 flex items-center">
+                            <i class="fas fa-square-root-alt mr-2" style="color: var(--primary-color);"></i>
+                            AI 数学概念
+                        </h4>
+                        <p class="mb-2">掌握 AI 安全相关的数学基础，例如：</p>
+                        <ul class="list-disc ml-8 space-y-2">
+                            <li>概率论（贝叶斯网络）</li>
+                            <li>线性代数（矩阵分解、特征值）</li>
+                            <li>优化方法（梯度下降）</li>
+                            <li>统计学（假设检验）</li>
+                        </ul>
+                        <p class="mt-2 italic">(无需逐一深入，重点关注与安全相关的部分)</p>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <h4 class="text-xl font-medium mb-2 flex items-center">
+                            <i class="fas fa-brain mr-2" style="color: var(--primary-color);"></i>
+                            AI 关键概念
+                        </h4>
+                        <p class="mb-2">了解 AI 主要领域和技术，如：</p>
+                        <ul class="list-disc ml-8 space-y-2">
+                            <li>机器学习基础（监督学习、无监督学习、评估指标、过拟合）</li>
+                            <li>深度学习基础（神经网络、CNN、RNN、Transformer）</li>
+                            <li>大语言模型（LLM）</li>
+                            <li>生成对抗网络（GAN）</li>
+                            <li>自然语言处理（NLP）</li>
+                            <li>强化学习（概念即可）</li>
+                        </ul>
+                        <p class="mt-2 italic">(重点关注安全相关的概念：对抗样本、数据/模型投毒、成员推理攻击)</p>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <h4 class="text-xl font-medium mb-2 flex items-center">
+                            <i class="fas fa-microchip mr-2" style="color: var(--primary-color);"></i>
+                            AI 硬件基础
+                        </h4>
+                        <p class="mb-2">了解 AI 计算硬件平台：</p>
+                        <ul class="list-disc ml-8 space-y-2">
+                            <li>GPU（主流训练/推理硬件）</li>
+                            <li>TPU（Google 专用加速器）</li>
+                            <li>FPGA（可定制加速）</li>
+                            <li>ASIC（专用芯片）</li>
+                            <li>边缘计算硬件</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <h3 id="security-challenges" class="text-2xl font-semibold mb-4">二、学习路径</h3>
+                
+                <div class="ml-4 mb-8">
+                    <div class="mb-6">
+                        <h4 class="text-xl font-medium mb-2 flex items-center">
+                            <i class="fas fa-gavel mr-2" style="color: var(--primary-color);"></i>
+                            法律法规与标准
+                        </h4>
+                        <p class="mb-2"><strong>重点：</strong> 数据隐私保护、模型安全、算法公平性相关法规。关注法规更新。</p>
+                        <p class="mb-2"><strong>关键法规/标准：</strong></p>
+                        <ul class="ml-8 space-y-2">
+                            <li><strong>欧盟：</strong> 《欧盟人工智能法案》(EU AI Act)（高风险 AI 严格监管），GDPR（数据隐私）。</li>
+                            <li><strong>美国：</strong> 拜登 AI 行政命令（安全、可靠、负责任），FTC 真实性声明，FAA（无人机），NHTSA（自动驾驶）。</li>
+                            <li><strong>中国：</strong> 《网络安全法》，《生成式人工智能服务管理暂行办法》。</li>
+                            <li><strong>国际标准：</strong> ISO/IEC 42001（AI 管理体系，重要），ISO/IEC 22989（术语），ISO/IEC TR 23894（风险管理），ANSI/UL 4600（自动驾驶安全评估）。</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <h4 class="text-xl font-medium mb-2 flex items-center">
+                            <i class="fas fa-robot mr-2" style="color: var(--primary-color);"></i>
+                            经典 AI 学习
+                        </h4>
+                        <p class="mb-2">掌握经典机器学习模型（原理、优缺点、应用场景）：</p>
+                        <ul class="list-disc ml-8 space-y-2">
+                            <li>线性模型（线性/逻辑回归、正则化）</li>
+                            <li>树模型（决策树、随机森林、GBDT）</li>
+                            <li>SVM</li>
+                            <li>朴素贝叶斯</li>
+                            <li>KNN</li>
+                            <li>聚类、降维（了解）</li>
+                        </ul>
+                        <p class="mt-2"><strong>安全角度：</strong> 理解经典模型的弱点，例如 SVM 易受对抗样本攻击。</p>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <h4 class="text-xl font-medium mb-2 flex items-center">
+                            <i class="fas fa-bug mr-2" style="color: var(--primary-color);"></i>
+                            探索 AI 漏洞与攻击
+                        </h4>
+                        <p class="mb-2">理解 AI 系统特有漏洞和攻击类型：</p>
+                        <ul class="list-disc ml-8 space-y-2">
+                            <li><strong>对抗样本攻击：</strong> 微小扰动输入导致模型错误。（攻击方法：FGSM、PGD 等；防御：对抗训练等）</li>
+                            <li><strong>数据/模型投毒攻击：</strong> 恶意数据影响模型性能。（供应链攻击，成员推断也属投毒；防御：数据清洗等）</li>
+                            <li><strong>后门攻击：</strong> 植入触发器，模型输出受控结果。</li>
+                            <li><strong>模型反演攻击：</strong> 从输出反推训练数据信息（隐私泄露）。</li>
+                            <li><strong>成员推理攻击：</strong> 推断数据是否在训练集中。</li>
+                            <li><strong>提示注入/越狱攻击：</strong> 诱导 LLM 产生不安全内容，绕过安全机制。（越狱技巧：肯定后缀、失忆、幻觉）</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <h4 class="text-xl font-medium mb-2 flex items-center">
+                            <i class="fas fa-shield-virus mr-2" style="color: var(--primary-color);"></i>
+                            探索 AI 保护方法
+                        </h4>
+                        <p class="mb-2">学习防御 AI 攻击，提高模型鲁棒性：</p>
+                        <ul class="list-disc ml-8 space-y-2">
+                            <li>对抗训练（增强鲁棒性）</li>
+                            <li>梯度掩蔽/输入预处理（降低对抗扰动）</li>
+                            <li>防御蒸馏（知识蒸馏提高鲁棒性）</li>
+                            <li>鲁棒性优化（更鲁棒的模型架构）</li>
+                            <li>偏差与公平性审计（AIF360、Fairlearn 等工具）</li>
+                            <li>同态加密（加密计算，保护隐私，效率待提升）</li>
+                            <li>隐私保护机器学习（PPML，多种技术综合）</li>
+                            <li>联邦学习（本地训练，保护隐私，安全聚合）</li>
+                            <li>零知识证明（验证模型属性）</li>
+                            <li>模型水印（版权保护）</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <h3 id="practice" class="text-2xl font-semibold mb-4">三、AI 安全技能等级</h3>
+                
+                <div class="timeline-container ml-4 mb-8 pb-6">
+                    <div class="timeline-item mb-8 fade-in delay-1">
+                        <h4 class="text-xl font-medium mb-2">等级 0 - 初学者：使用 AI</h4>
+                        <ul class="list-disc ml-8">
+                            <li>了解 AI 局限性，基本使用 AI。</li>
+                            <li><strong>强调：</strong>认识到 AI 非万能</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="timeline-item mb-8 fade-in delay-2">
+                        <h4 class="text-xl font-medium mb-2">等级 1 - 应用专家：应用感知</h4>
+                        <ul class="list-disc ml-8">
+                            <li>有效使用 AI 方案，识别潜在风险。</li>
+                            <li><strong>关注点：</strong>安全使用 AI</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="timeline-item mb-8 fade-in delay-3">
+                        <h4 class="text-xl font-medium mb-2">等级 2 - 开发专家：精进与扩展</h4>
+                        <ul class="list-disc ml-8">
+                            <li>改进/扩展 AI 系统，理解架构/算法原理，基本 AI 安全防御。</li>
+                            <li><strong>关键技能：</strong>模型原理, 复现简单攻击, 基本防御</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="timeline-item fade-in delay-4">
+                        <h4 class="text-xl font-medium mb-2">等级 3 - 创新专家：系统视野</h4>
+                        <ul class="list-disc ml-8">
+                            <li>系统性思考 AI 安全，提出新方法，开发创新方案。</li>
+                            <li><strong>关键技能：</strong>深入安全原理, 设计/实现新防御方法</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LLM Overview -->
+        <section id="llm-overview" class="mb-20 fade-in">
+            <h2 class="section-title text-3xl font-bold mb-8">第二卷：大模型概览</h2>
+            
+            <div class="card p-8 mb-10">
+                <h3 class="text-2xl font-semibold mb-6">大模型的前世今生</h3>
+                
+                <div class="mb-8">
+                    <h4 class="text-xl font-medium mb-4">人工智能定义可分为三类：</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="card p-5">
+                            <h5 class="font-semibold mb-2 flex items-center">
+                                <i class="fas fa-robot mr-2" style="color: var(--primary-color);"></i>
+                                弱人工智能 (Narrow AI)
+                            </h5>
+                            <p>专注特定领域，高效执行预设任务，但缺乏自主学习和通用智能。当前应用最广泛，如推荐系统、AlphaGo、机器人客服。</p>
+                        </div>
+                        
+                        <div class="card p-5">
+                            <h5 class="font-semibold mb-2 flex items-center">
+                                <i class="fas fa-brain mr-2" style="color: var(--primary-color);"></i>
+                                强人工智能 (AGI)
+                     
+                            </h5>
+                            <p>通用人工智能，具备人类水平认知能力，可理解、学习和运用知识。目前尚处研究阶段，被视为终极目标，潜力巨大，如医疗诊断、法律咨询、科学研究。</p>
+                        </div>
+                        
+                        <div class="card p-5">
+                            <h5 class="font-semibold mb-2 flex items-center">
+                                <i class="fas fa-lightbulb mr-2" style="color: var(--primary-color);"></i>
+                                超强人工智能 (ASI)
+                            </h5>
+                            <p>在所有方面超越人类智能的假设形态，认知能力和创新能力远超人类，或将带来社会最大变革与挑战。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-8">
+                    <h4 class="text-xl font-medium mb-4">人工智能发展脉络（关键里程碑）：</h4>
+                    <div class="overflow-x-auto">
+                        <table class="custom-table">
+                            <tr>
+                                <th>时期</th>
+                                <th>事件</th>
+                                <th>意义</th>
+                            </tr>
+                            <tr>
+                                <td>1940s</td>
+                                <td>电子大脑概念提出</td>
+                                <td>AI 探索开端</td>
+                            </tr>
+                            <tr>
+                                <td>1950s</td>
+                                <td>感知器发明</td>
+                                <td>神经网络研究起点</td>
+                            </tr>
+                            <tr>
+                                <td>1980s</td>
+                                <td>多层感知机和反向传播算法突破</td>
+                                <td>深度学习理论基础</td>
+                            </tr>
+                            <tr>
+                                <td>1997年</td>
+                                <td>深蓝战胜国际象棋冠军</td>
+                                <td>AI 特定领域决策能力展现</td>
+                            </tr>
+                            <tr>
+                                <td>2012年</td>
+                                <td>AlexNet 在 ImageNet 竞赛获胜</td>
+                                <td>深度学习视觉领域里程碑</td>
+                            </tr>
+                            <tr>
+                                <td>2016年</td>
+                                <td>AlphaGo 击败围棋冠军</td>
+                                <td>AI 复杂策略决策能力证明</td>
+                            </tr>
+                            <tr>
+                                <td>2017年</td>
+                                <td>Transformer 模型提出</td>
+                                <td>自然语言处理新纪元</td>
+                            </tr>
+                            <tr>
+                                <td>2018年</td>
+                                <td>BERT 模型发布</td>
+                                <td>预训练语言模型性能提升</td>
+                            </tr>
+                            <tr>
+                                <td>2020年</td>
+                                <td>大模型时代来临</td>
+                                <td>AlphaFold 蛋白质结构预测革命性突破</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <p class="mt-4 italic">总结： 人工智能历经数学统计、机器学习、深度学习，最终进入大模型时代。模型从感知理解世界到生成创造内容跃迁。当前大模型分为公有和私有，AI 内容生成（AiGC）以 GPT 为代表。</p>
+                </div>
+                
+                <div class="mb-8">
+                    <h4 class="text-xl font-medium mb-4">大模型关键技术栈</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="card p-5">
+                            <h5 class="font-semibold mb-2">1. 机器学习</h5>
+                            <p class="mb-2">赋予计算机学习能力，从数据中学习模式与规律，进行决策和预测。</p>
+                            <p class="mb-1"><strong>分类：</strong></p>
+                            <ul class="list-disc ml-6 mb-2">
+                                <li>监督学习（带标签数据）</li>
+                                <li>无监督学习（无标签数据）</li>
+                                <li>半监督学习（少量标签 + 大量无标签）</li>
+                                <li>强化学习（与环境交互学习策略）</li>
+                            </ul>
+                            <p class="italic">传统机器学习过度依赖人工特征工程，表达能力有限。</p>
+                        </div>
+                        
+                        <div class="card p-5">
+                            <h5 class="font-semibold mb-2">2. 深度学习</h5>
+                            <p class="mb-2">机器学习的延伸，基于神经网络构建模型，多层节点学习数据深层复杂表征。擅长挖掘复杂模式和特征。</p>
+                            <p class="mb-1"><strong>网络结构：</strong></p>
+                            <ul class="list-disc ml-6 mb-2">
+                                <li>CNN（卷积神经网络）</li>
+                                <li>RNN（循环神经网络）</li>
+                            </ul>
+                            <p class="italic">深度学习在计算机视觉、语音识别、自然语言处理（NLP）领域取得巨大成就，但模型可解释性差，被视为"黑盒"。</p>
+                        </div>
+                        
+                        <div class="card p-5">
+                            <h5 class="font-semibold mb-2">3. 基础设施</h5>
+                            <p class="mb-2">算力、数据、算法是 AI 发展的核心要素。</p>
+                            <ul class="list-disc ml-6">
+                                <li><strong>数据：</strong> AI 的燃料，质量和规模决定性能上限。</li>
+                                <li><strong>算法：</strong> AI 的引擎，包括机器学习和深度学习算法。</li>
+                                <li><strong>算力：</strong> AI 的基础设施，芯片技术决定发展速度。</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="card p-5">
+                            <h5 class="font-semibold mb-2">4. 训练与推理</h5>
+                            <p class="mb-2">AI 模型生命周期的关键环节。</p>
+                            <ul class="list-disc ml-6">
+                                <li><strong>训练：</strong> 使用标注数据调整模型参数，学习数据模式和规律。</li>
+                                <li><strong>推理：</strong> 应用训练好的模型到新数据，完成预测等任务。</li>
+                            </ul>
+                            <p class="italic">训练如"寒窗苦读"，推理如"金榜题名"。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card p-8 mb-10">
+                <h3 class="text-2xl font-semibold mb-6">LLM 核心概念与常识</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="text-xl font-medium mb-4">大型语言模型概述</h4>
+                        <p class="mb-4">基于 Transformer 架构，参数庞大（千亿级），通过自监督学习预测下一个词。</p>
+                        
+                        <h4 class="text-xl font-medium mb-4">核心概念</h4>
+                        <ul class="space-y-3 mb-6">
+                            <li class="flex">
+                                <i class="fas fa-keyboard text-lg mr-3 mt-1" style="color: var(--primary-color);"></i>
+                                <div>
+                                    <span class="font-medium">Prompt（提示词）:</span> 语言编程，弥补人机认知差异。
+                                </div>
+                            </li>
+                            <li class="flex">
+                                <i class="fas fa-sitemap text-lg mr-3 mt-1" style="color: var(--primary-color);"></i>
+                                <div>
+                                    <span class="font-medium">CoT（思维链）:</span> 模仿人类逻辑，增加思考 Token。
+                                </div>
+                            </li>
+                            <li class="flex">
+                                <i class="fas fa-tools text-lg mr-3 mt-1" style="color: var(--primary-color);"></i>
+                                <div>
+                                    <span class="font-medium">工具调用:</span> 需训练数据支持。
+                                </div>
+                            </li>
+                        </ul>
+                        
+                        <h4 class="text-xl font-medium mb-4">运作原理与局限</h4>
+                        <ul class="space-y-3">
+                            <li class="flex">
+                                <i class="fas fa-percentage text-lg mr-3 mt-1" style="color: var(--primary-color);"></i>
+                                <div>
+                                    <span class="font-medium">概率模型:</span> 模式匹配生成文本，无意识生成，依赖训练数据质量。
+                                </div>
+                            </li>
+                            <li class="flex">
+                                <i class="fas fa-language text-lg mr-3 mt-1" style="color: var(--primary-color);"></i>
+                                <div>
+                                    <span class="font-medium">语言任务能力强:</span> 翻译、摘要、问答。
+                                </div>
+                            </li>
+                            <li class="flex">
+                                <i class="fas fa-calculator text-lg mr-3 mt-1" style="color: var(--primary-color);"></i>
+                                <div>
+                                    <span class="font-medium">逻辑算术弱:</span> 逻辑推理、算术、因果关系理解弱。
+                                </div>
+                            </li>
+                            <li class="flex">
+                                <i class="fas fa-calendar-alt text-lg mr-3 mt-1" style="color: var(--primary-color);"></i>
+                                <div>
+                                    <span class="font-medium">知识截止日期:</span> 不适合实时信息。
+                                </div>
+                            </li>
+                            <li class="flex">
+                                <i class="fas fa-ghost text-lg mr-3 mt-1" style="color: var(--primary-color);"></i>
+                                <div>
+                                    <span class="font-medium">幻觉与偏见:</span> 可能错误陈述，反映数据偏见。
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-xl font-medium mb-4">微调与上下文长度</h4>
+                        <ul class="space-y-3 mb-6">
+                            <li class="flex">
+                                <i class="fas fa-sliders-h text-lg mr-3 mt-1" style="color: var(--primary-color);"></i>
+                                <div>
+                                    <span class="font-medium">微调:</span> 预训练模型在特定数据集上再训练，适应任务/领域。
+                                </div>
+                            </li>
+                            <li class="flex">
+                                <i class="fas fa-arrows-alt-h text-lg mr-3 mt-1" style="color: var(--primary-color);"></i>
+                                <div>
+                                    <span class="font-medium">上下文长度:</span> 模型一次处理的最大令牌数，限制信息量。
+                                </div>
+                            </li>
+                        </ul>
+                        
+                        <h4 class="text-xl font-medium mb-4">提示工程与训练过程</h4>
+                        <ul class="space-y-3 mb-6">
+                            <li class="flex">
+                                <i class="fas fa-file-alt text-lg mr-3 mt-1" style="color: var(--primary-color);"></i>
+                                <div>
+                                    <span class="font-medium">清晰指令:</span> 提供明确指令。
+                                </div>
+                            </li>
+                            <li class="flex">
+                                <i class="fas fa-clone text-lg mr-3 mt-1" style="color: var(--primary-color);"></i>
+                                <div>
+                                    <span class="font-medium">少样本学习:</span> 示例引导。
+                                </div>
+                            </li>
+                            <li class="flex">
+                                <i class="fas fa-sort-amount-down text-lg mr-3 mt-1" style="color: var(--primary-color);"></i>
+                                <div>
+                                    <span class="font-medium">提示结构:</span> 顺序结构影响输出。
+                                </div>
+                            </li>
+                            <li class="flex">
+                                <i class="fas fa-thermometer-half text-lg mr-3 mt-1" style="color: var(--primary-color);"></i>
+                                <div>
+                                    <span class="font-medium">温度参数:</span> 控制随机性。
+                                </div>
+                            </li>
+                            <li class="flex">
+                                <i class="fas fa-database text-lg mr-3 mt-1" style="color: var(--primary-color);"></i>
+                                <div>
+                                    <span class="font-medium">训练数据:</span> 大规模文本语料库。
+                                </div>
+                            </li>
+                        </ul>
+                        
+                        <h4 class="text-xl font-medium mb-4">Transformer 模型核心概念</h4>
+                        <ul class="space-y-3">
+                            <li class="flex">
+                                <i class="fas fa-search text-lg mr-3 mt-1" style="color: var(--primary-color);"></i>
+                                <div>
+                                    <span class="font-medium">注意力机制:</span> 关注输入序列的不同部分，捕捉长距离依赖。
+                                </div>
+                            </li>
+                            <li class="flex">
+                                <i class="fas fa-vector-square text-lg mr-3 mt-1" style="color: var(--primary-color);"></i>
+                                <div>
+                                    <span class="font-medium">嵌入:</span> 文本标记映射到高维向量，理解词关系。
+                                </div>
+                            </li>
+                            <li class="flex">
+                                <i class="fas fa-map-marker-alt text-lg mr-3 mt-1" style="color: var(--primary-color);"></i>
+                                <div>
+                                    <span class="font-medium">位置编码:</span> 提供标记位置信息。
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Security -->
+        <section id="security" class="mb-20 fade-in">
+            <h2 class="section-title text-3xl font-bold mb-8">第四卷：AI 安全工程实践</h2>
+            
+            <div class="card p-8 mb-10">
+                <p class="mb-6">AI 安全在网络安全领域日益重要，但其独特性带来新的安全挑战。AI 安全不仅关乎传统网络安全，也涉及隐私、伦理等更广泛层面。AI 红队测试是评估和提升 AI 系统安全性的关键实践。</p>
+                
+                <h3 class="text-2xl font-semibold mb-6">AI 安全工具：赋能安全分析</h3>
+                
+                <p class="mb-4">AI 技术正被应用于安全工具的开发，以提升代码审计、网络侦察、渗透测试及安全防御的效率和精度。</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                    <div class="card p-5">
+                        <h4 class="text-xl font-medium mb-3 flex items-center">
+                            <i class="fas fa-code mr-3" style="color: var(--primary-color);"></i>
+                            代码审计与漏洞分析
+                        </h4>
+                        <ul class="space-y-2">
+                            <li><strong>工具:</strong> AutoAudit、SourceGPT</li>
+                            <li><strong>功能:</strong> 利用 LLM 辅助代码审查，提升漏洞检测和合规性检查效率</li>
+                            <li><strong>局限:</strong> 准确性依赖于模型能力，可能存在误报漏报，复杂漏洞识别仍受限</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="card p-5">
+                        <h4 class="text-xl font-medium mb-3 flex items-center">
+                            <i class="fas fa-search mr-3" style="color: var(--primary-color);"></i>
+                            网络侦察与威胁情报
+                        </h4>
+                        <ul class="space-y-2">
+                            <li><strong>工具:</strong> CensysGPT、ZoomEyeGPT</li>
+                            <li><strong>功能:</strong> 结合 GPT 模型与数据源，增强威胁情报收集与资产发现能力</li>
+                            <li><strong>局限:</strong> 效果受限于数据覆盖范围及 GPT 分析能力</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="card p-5">
+                        <h4 class="text-xl font-medium mb-3 flex items-center">
+                            <i class="fas fa-user-secret mr-3" style="color: var(--primary-color);"></i>
+                            渗透测试与漏洞利用
+                        </h4>
+                        <ul class="space-y-2">
+                            <li><strong>工具:</strong> PentestGPT、burpgpt</li>
+                            <li><strong>功能:</strong> 利用 GPT 模型辅助渗透测试，自动化生成攻击脚本和漏洞分析报告</li>
+                            <li><strong>局限:</strong> 需警惕脚本风险和误报漏报</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="card p-5">
+                        <h4 class="text-xl font-medium mb-3 flex items-center">
+                            <i class="fas fa-shield-alt mr-3" style="color: var(--primary-color);"></i>
+                            安全检测与防御
+                        </h4>
+                        <ul class="space-y-2">
+                            <li><strong>工具:</strong> k8sgpt、cloudgpt</li>
+                            <li><strong>功能:</strong> 利用 LLM 分析 Kubernetes 集群和 AWS 云环境，辅助故障排除和安全审计</li>
+                            <li><strong>局限:</strong> 效果依赖于 LLM 对特定领域知识的掌握程度</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card p-8 mb-10">
+                <h3 class="text-2xl font-semibold mb-6">第五卷：AI安全体系与红队测试</h3>
+                
+                <div class="mb-8">
+                    <h4 class="text-xl font-medium mb-4">AI 安全体系：独特的挑战与多层防护</h4>
+                    <p class="mb-4">AI 安全的独特性在于其学习能力和决策过程的非确定性，使得传统安全方法难以完全适用。AI 危害不仅涉及网络安全风险，更扩展到隐私和伦理层面。</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="card p-5">
+                            <h5 class="font-semibold mb-2">AI 核心危害</h5>
+                            <ul class="list-disc ml-6 space-y-1">
+                                <li><strong>安全相关危害：</strong>模型盗窃、模型完整性受损、训练数据中毒、对抗性攻击、过度依赖 AI</li>
+                                <li><strong>伦理与策略相关危害：</strong>隐私冲突、违规内容生成、危险功能滥用、破坏决策系统、负面公共影响、知识产权侵权</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="card p-5">
+                            <h5 class="font-semibold mb-2">AI 安全面临的挑战</h5>
+                            <p>AI 技术的快速迭代带来安全风险，安全措施难以跟进。负责任 AI (RAI) 强调在 AI 系统全生命周期中融入伦理、公平、透明等原则，构建可信赖的 AI 系统。</p>
+                        </div>
+                    </div>
+                    
+                    <h5 class="text-lg font-semibold mb-3">AI 安全三层架构及应对策略</h5>
+                    <p class="mb-3">为有效应对 AI 攻击，可将 AI 体系结构分为三层，并采取分层安全策略：</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="card p-4">
+                            <h6 class="font-medium mb-2">AI 使用情况层</h6>
+                            <p class="mb-2"><strong>安全挑战:</strong> 用户行为和责任至关重要，安全护栏和用户教育是关键</p>
+                            <p><strong>应对策略:</strong> 强化用户安全意识，更新策略，警惕 AI 欺骗</p>
+                        </div>
+                        
+                        <div class="card p-4">
+                            <h6 class="font-medium mb-2">AI 应用程序层</h6>
+                            <p class="mb-2"><strong>安全挑战:</strong> 恶意请求风险及 AI 资源协调安全</p>
+                            <p><strong>应对策略:</strong> 构建应用安全系统，深度检查请求内容和资源协调过程</p>
+                        </div>
+                        
+                        <div class="card p-4">
+                            <h6 class="font-medium mb-2">AI 平台层</h6>
+                            <p class="mb-2"><strong>安全挑战:</strong> 防范有害指令输入、有害内容输出和内容分类复杂性</p>
+                            <p><strong>应对策略:</strong> 构建输入输出安全系统，内容安全检测及动态内容分类机制</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-8">
+                    <h4 class="text-xl font-medium mb-4">常见 AI 对齐对抗手法：越狱攻击及防御框架</h4>
+                    
+                    <div class="card p-6 mb-6 bg-blue-50 dark:bg-blue-900">
+                        <h5 class="font-semibold mb-3">越狱攻击核心</h5>
+                        <p>打破常规限制，利用 Prompt 操控 AI 模型输出有害内容。利用 AI 对文本指令的高度依赖性及安全规则的局限性。</p>
+                    </div>
+                    
+                    <h5 class="font-semibold mb-3">主要越狱技巧</h5>
+                    <ul class="list-disc ml-6 space-y-2 mb-6">
+                        <li><strong>多轮对话越狱：</strong>利用"登门效应"，通过渐进诱导、语义迷惑和上下文连贯性利用，逐步突破模型安全防线</li>
+                        <li><strong>角色扮演：</strong>结合 CO-STAR 框架，构造更具迷惑性和攻击性的 Prompt</li>
+                        <li><strong>反向诱导、逆向思维：</strong>运用逆向思维方式，诱导模型输出期望的有害内容</li>
+                        <li><strong>其他技巧：</strong>绕过 WAF、前置抑制、PUA 道德绑架、小语种、代码形式绕过、虚拟化与虚构背景越狱、基于 Token 的越狱等</li>
+                    </ul>
+                    
+                    <h5 class="font-semibold mb-3">自动化越狱探索引擎</h5>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="card p-4">
+                            <h6 class="font-medium mb-2">遗传算法：模拟生物进化</h6>
+                            <p>通过构建初始种群、适应度评估、选择与变异、迭代进化等步骤，逐步演化出更有效的越狱提示，实现自动化越狱。</p>
+                        </div>
+                        
+                        <div class="card p-4">
+                            <h6 class="font-medium mb-2">梯度下降法：迭代优化对抗性后缀</h6>
+                            <p>通过构建损失函数、梯度计算和迭代修改对抗性后缀，逐步优化 Prompt，最终生成可绕过安全防线的"魔法后缀"。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-xl font-medium mb-4">AI 红队测试：实战化安全评估</h4>
+                    <p class="mb-4">AI 红队测试是模拟真实攻击，评估 AI 系统安全性的关键方法，旨在发现漏洞、提升防御能力、保障 RAI。</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="card p-5">
+                            <h5 class="font-semibold mb-2">AI 红队与传统红队的区别</h5>
+                            <p>AI 红队在漏洞类型、测试方法、团队构成和测试目标上均与传统红队测试存在差异，需要关注模型安全、AI 特有漏洞及 RAI 风险，测试方法更强调迭代、自动化与人工结合，团队构成需多元化。</p>
+                        </div>
+                        
+                        <div class="card p-5">
+                            <h5 class="font-semibold mb-2">AI 红队流程</h5>
+                            <p>包括项目方案、组建多元红队、设计多层测试、迭代执行测试、结构化报告结果五个关键步骤，形成持续循环迭代的安全评估和改进机制。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Legal Regulations -->
+        <section id="legal" class="mb-20 fade-in">
+            <h2 class="section-title text-3xl font-bold mb-8">第六卷：AI备案与法律</h2>
+            
+            <div class="card p-8">
+                <h3 class="text-2xl font-semibold mb-6">一、备案概述：大模型服务的"通行证"</h3>
+                
+                <div class="mb-8">
+<h4 class="text-xl font-medium mb-4">备案定义：</h4>
+                   <p class="mb-6">AI大模型备案是根据中国《生成式人工智能服务管理暂行办法》（2023年8月15日施行）要求，面向公众提供服务的大模型需向国家互联网信息办公室（网信办）进行备案，以规范技术发展，保障国家安全、社会公共利益和个人信息权益。</p>
+                   
+                   <h4 class="text-xl font-medium mb-4">备案必要性：</h4>
+                   <ul class="list-disc ml-8 space-y-2 mb-6">
+                       <li><strong>保障公众利益，防范AI风险：</strong> 防范个人信息泄露、虚假信息传播、算法歧视和国家安全风险。</li>
+                       <li><strong>维护社会安全，强化风险管控：</strong> 构建风险预警机制，源头治理不良信息，提升网络安全防护，明确责任主体。</li>
+                       <li><strong>促进技术健康发展：</strong> 建立行业信任，引导技术创新方向，营造公平竞争环境。</li>
+                   </ul>
+                   <p class="italic mb-6">总结： 备案旨在为AI技术发展保驾护航，确保其在安全合规的轨道上发展。</p>
+               </div>
+               
+               <h3 class="text-2xl font-semibold mb-6">二、备案材料：六大核心"零件"</h3>
+               
+               <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                   <div class="card p-5">
+                       <div class="flex items-center mb-3">
+                           <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style="background-color: var(--primary-color);">1</div>
+                           <h5 class="font-semibold ml-3">大模型上线备案表</h5>
+                       </div>
+                       <p>展示模型基本信息、技术能力及安全保障措施，是备案申请的核心。</p>
+                   </div>
+                   
+                   <div class="card p-5">
+                       <div class="flex items-center mb-3">
+                           <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style="background-color: var(--primary-color);">2</div>
+                           <h5 class="font-semibold ml-3">安全评估报告</h5>
+                       </div>
+                       <p>由第三方机构出具，评估模型的安全性、合规性及潜在风险。</p>
+                   </div>
+                   
+                   <div class="card p-5">
+                       <div class="flex items-center mb-3">
+                           <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style="background-color: var(--primary-color);">3</div>
+                           <h5 class="font-semibold ml-3">模型服务协议</h5>
+                       </div>
+                       <p>明确服务方与用户权利义务的法律契约。</p>
+                   </div>
+                   
+                   <div class="card p-5">
+                       <div class="flex items-center mb-3">
+                           <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style="background-color: var(--primary-color);">4</div>
+                           <h5 class="font-semibold ml-3">语料标注规则</h5>
+                       </div>
+                       <p>指导数据标注工作的操作手册，确保数据质量和合规性。</p>
+                   </div>
+                   
+                   <div class="card p-5">
+                       <div class="flex items-center mb-3">
+                           <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style="background-color: var(--primary-color);">5</div>
+                           <h5 class="font-semibold ml-3">拦截关键词列表</h5>
+                       </div>
+                       <p>内容安全的"黑名单"，阻止模型生成有害信息。</p>
+                   </div>
+                   
+                   <div class="card p-5">
+                       <div class="flex items-center mb-3">
+                           <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style="background-color: var(--primary-color);">6</div>
+                           <h5 class="font-semibold ml-3">评估测试题集</h5>
+                       </div>
+                       <p>用于测试模型安全性、合规性及可靠性的"考卷"。</p>
+                   </div>
+               </div>
+               
+               <h3 class="text-2xl font-semibold mb-6">三、备案流程："闯关游戏"六步走</h3>
+               
+               <div class="timeline-container ml-4 mb-8 pb-6">
+                   <div class="timeline-item mb-8 fade-in delay-1">
+                       <h4 class="text-xl font-medium mb-2">第一步：当地网信办登记</h4>
+                       <p>确定备案地点，提交初步申请材料，领取备案表与办理指南，填写并提交备案表，跟进审核进度。</p>
+                   </div>
+                   
+                   <div class="timeline-item mb-8 fade-in delay-2">
+                       <h4 class="text-xl font-medium mb-2">第二步：准备材料</h4>
+                       <p>技术团队、法务团队、数据团队、安全团队协同合作，准备技术、合规、数据安全、安全评估等材料。</p>
+                   </div>
+                   
+                   <div class="timeline-item mb-8 fade-in delay-3">
+                       <h4 class="text-xl font-medium mb-2">第三步：企业内部评估</h4>
+                       <p>进行内部全面评估，编写材料说明，准备测试账号，模拟网信办审核流程。</p>
+                   </div>
+                   
+                   <div class="timeline-item mb-8 fade-in delay-4">
+                       <h4 class="text-xl font-medium mb-2">第四步：提交材料</h4>
+                       <p>正式提交备案材料和测试账号至网信办，等待审查，保持沟通，跟踪审核结果。</p>
+                   </div>
+                   
+                   <div class="timeline-item mb-8 fade-in delay-5">
+                       <h4 class="text-xl font-medium mb-2">第五步：当地网信办初步审核</h4>
+                       <p>审核通过后上报省级网信办；未通过则调整策略，重新提交材料。</p>
+                   </div>
+                   
+                   <div class="timeline-item fade-in delay-5">
+                       <h4 class="text-xl font-medium mb-2">第六步：中央网信办复审</h4>
+                       <p>省级网信办审核后，中央网信办进行最终复审，通过后获取备案号与证书。</p>
+                   </div>
+               </div>
+               
+               <h3 class="text-2xl font-semibold mb-6">四、填报注意事项："锦囊妙计"</h3>
+               
+               <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                   <div class="card p-5">
+                       <div class="flex items-center mb-3">
+                           <i class="fas fa-check-circle text-2xl mr-3" style="color: var(--primary-color);"></i>
+                           <h5 class="font-semibold">材料真实全面</h5>
+                       </div>
+                       <p>信息必须真实准确，材料全面完整。</p>
+                   </div>
+                   
+                   <div class="card p-5">
+                       <div class="flex items-center mb-3">
+                           <i class="fas fa-file-alt text-2xl mr-3" style="color: var(--primary-color);"></i>
+                           <h5 class="font-semibold">评估报告明确结论</h5>
+                       </div>
+                       <p>报告需有明确肯定的结论，避免模棱两可。</p>
+                   </div>
+                   
+                   <div class="card p-5">
+                       <div class="flex items-center mb-3">
+                           <i class="fas fa-tasks text-2xl mr-3" style="color: var(--primary-color);"></i>
+                           <h5 class="font-semibold">测试题符合国家标准</h5>
+                       </div>
+                       <p>测试题设计需对标国家标准，确保模型测试结果达标。</p>
+                   </div>
+                   
+                   <div class="card p-5">
+                       <div class="flex items-center mb-3">
+                           <i class="fas fa-handshake text-2xl mr-3" style="color: var(--primary-color);"></i>
+                           <h5 class="font-semibold">寻求专业机构协助</h5>
+                       </div>
+                       <p>专业机构可提供全方位服务，提升备案成功率。</p>
+                   </div>
+               </div>
+               
+               <div class="bg-blue-50 dark:bg-blue-900 p-6 rounded-lg">
+                   <p class="font-medium text-center">强调： 备案之路道阻且长，但行则将至。备案成功后，持续合规运营至关重要。</p>
+               </div>
+           </div>
+       </section>
+   </main>
+
+   <!-- CTA section -->
+   <section class="py-16 px-4 text-center" style="background-color: var(--accent-color);">
+       <div class="container mx-auto max-w-4xl">
+           <h2 class="text-3xl font-bold mb-6">准备好成为 AI 安全专家了吗？</h2>
+           <p class="text-lg mb-8">深入学习 AI 安全知识，掌握关键技能，应对不断演变的 AI 安全挑战。</p>
+           <div class="flex flex-col sm:flex-row justify-center gap-4">
+               <a href="#learning-path" class="btn px-8 py-3 rounded-lg font-medium text-white" style="background-color: var(--primary-color);">
+                   开始学习路径
+               </a>
+               <a href="#security" class="btn px-8 py-3 rounded-lg font-medium border-2" style="border-color: var(--primary-color); color: var(--primary-color);">
+                   探索安全实践
+               </a>
+           </div>
+       </div>
+   </section>
+
+   <!-- Footer -->
+   <footer class="py-12 px-4" style="background-color: var(--card-color);">
+       <div class="container mx-auto max-w-6xl">
+           <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+               <div>
+                   <div class="flex items-center mb-4">
+                       <i class="fas fa-brain text-3xl mr-2" style="color: var(--primary-color);"></i>
+                       <span class="text-xl font-bold">AI迷思录</span>
+                   </div>
+                   <p class="mb-4">应用与安全指南：从基础到实战的 AI 安全学习之旅</p>
+                   <div class="flex space-x-4">
+                       <a href="https://x.com/xishan12509850" target="_blank" class="hover:opacity-75">
+                           <i class="fab fa-twitter text-xl" style="color: var(--primary-color);"></i>
+                       </a>
+                       <a href="https://github.com/Acmesec/theAIMythbook" target="_blank" class="hover:opacity-75">
+                           <i class="fab fa-github text-xl" style="color: var(--primary-color);"></i>
+                       </a>
+                   </div>
+               </div>
+               
+               <div>
+                   <h3 class="font-semibold text-lg mb-4">快速导航</h3>
+                   <ul class="space-y-2">
+                       <li><a href="#intro" class="hover:underline">绪论</a></li>
+                       <li><a href="#learning-path" class="hover:underline">学习路径</a></li>
+                       <li><a href="#llm-overview" class="hover:underline">大模型概览</a></li>
+                       <li><a href="#security" class="hover:underline">安全工程</a></li>
+                       <li><a href="#legal" class="hover:underline">法律法规</a></li>
+                   </ul>
+               </div>
+               
+               <div>
+                   <h3 class="font-semibold text-lg mb-4">核心内容</h3>
+                   <ul class="space-y-2">
+                       <li><a href="#basics" class="hover:underline">基础知识</a></li>
+                       <li><a href="#security-challenges" class="hover:underline">安全挑战</a></li>
+                       <li><a href="#practice" class="hover:underline">实践应用</a></li>
+                   </ul>
+               </div>
+               
+               <div>
+                   <h3 class="font-semibold text-lg mb-4">作者信息</h3>
+                   <p class="mb-2">作者: 洺熙</p>
+                   <p class="mb-4">AI安全研究与实践专家</p>
+                   <a href="https://github.com/Acmesec/theAIMythbook" target="_blank" class="inline-flex items-center px-4 py-2 rounded-lg font-medium text-white" style="background-color: var(--primary-color);">
+                       <i class="fab fa-github mr-2"></i> GitHub 项目
+                   </a>
+               </div>
+           </div>
+           
+           <div class="pt-8 border-t" style="border-color: var(--border-color);">
+               <div class="flex flex-col md:flex-row justify-between items-center">
+                   <p>&copy; 2025 AI迷思录 - 版权所有</p>
+                   <p class="mt-2 md:mt-0">数据更新至 2025 年 3 月</p>
+               </div>
+           </div>
+       </div>
+   </footer>
+
+   <script>
+       // Mobile menu toggle
+       const mobileMenuButton = document.getElementById('mobile-menu-button');
+       const mobileMenu = document.getElementById('mobile-menu');
+       
+       mobileMenuButton.addEventListener('click', () => {
+           mobileMenu.classList.toggle('hidden');
+       });
+       
+       // Theme toggle
+       const themeToggle = document.getElementById('theme-toggle');
+       const html = document.documentElement;
+       
+       // Check system preference
+       if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+           html.classList.remove('light');
+           html.classList.add('dark');
+       }
+       
+       themeToggle.addEventListener('click', () => {
+           html.classList.toggle('dark');
+           html.classList.toggle('light');
+       });
+       
+       // Fade-in animation on scroll
+       const observerOptions = {
+           root: null,
+           rootMargin: '0px',
+           threshold: 0.1
+       };
+       
+       const observer = new IntersectionObserver((entries) => {
+           entries.forEach(entry => {
+               if (entry.isIntersecting) {
+                   entry.target.style.animationPlayState = 'running';
+                   observer.unobserve(entry.target);
+               }
+           });
+       }, observerOptions);
+       
+       document.querySelectorAll('.fade-in').forEach(element => {
+           element.style.animationPlayState = 'paused';
+           observer.observe(element);
+       });
+       
+       // Smooth scrolling for anchor links
+       document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+           anchor.addEventListener('click', function (e) {
+               e.preventDefault();
+               
+               const targetId = this.getAttribute('href');
+               const targetElement = document.querySelector(targetId);
+               
+               if (targetElement) {
+                   window.scrollTo({
+                       top: targetElement.offsetTop - 100,
+                       behavior: 'smooth'
+                   });
+                   
+                   // Close mobile menu if open
+                   if (!mobileMenu.classList.contains('hidden')) {
+                       mobileMenu.classList.add('hidden');
+                   }
+               }
+           });
+       });
+   </script>
+</body>
+</html>

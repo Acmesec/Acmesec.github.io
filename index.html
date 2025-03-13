@@ -8,6 +8,154 @@
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.acmesec.cn/; img-src 'self' https://www.acmesec.cn/;">
     <link rel="stylesheet" href="css/modern.css">
     <link rel="stylesheet" href="css/animations.css">
+    <style>
+        /* 修复横向滚动条问题 */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+        }
+        
+        /* 更全面地确保所有内容不会溢出其容器 */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        
+        img, svg, canvas, div, section {
+            max-width: 100%;
+        }
+        
+        /* 确保网格布局不会溢出 */
+        .service-grid, 
+        .project-grid, 
+        .partner-grid,
+        .about-content {
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+        
+        /* 修复移动菜单可能的溢出问题 */
+        #mobile-menu {
+            width: 100%;
+            max-width: 100%;
+        }
+        
+        /* 修复Tailwind类可能导致的问题 */
+        .container {
+            width: 100%;
+            max-width: 100%;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            margin-left: auto;
+            margin-right: auto;
+            overflow-x: hidden;
+        }
+        
+        /* 修复合作伙伴logo可能的溢出 */
+        .partner-logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+            max-width: 100%;
+        }
+        
+        .partner-logo img {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        /* 确保移动菜单项不会溢出 */
+        #mobile-menu a {
+            display: block;
+            width: 100%;
+        }
+        
+        /* 解决hero区域可能的溢出问题 */
+        .hero {
+            width: 100%;
+            max-width: 100vw;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .hero-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+        }
+        
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        /* 修复合作伙伴部分可能的溢出 */
+        .partners {
+            width: 100%;
+            overflow: hidden;
+        }
+        
+        .partner-grid {
+            width: 100%;
+            display: grid;
+            overflow: hidden;
+        }
+        
+        /* 修复AOS动画可能导致的溢出 */
+        [data-aos] {
+            overflow: hidden;
+        }
+        
+        /* 修复所有部分的宽度 */
+        section {
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
+        }
+        
+        /* 修复小屏幕上的导航栏可能溢出 */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-wrap: wrap;
+                width: 100%;
+                padding: 0 1rem;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                width: 100%;
+            }
+        }
+        
+        /* 修复可能的负边距问题 */
+        .mx-auto {
+            margin-left: auto !important;
+            margin-right: auto !important;
+            max-width: 100% !important;
+        }
+        
+        /* 修复可能的绝对定位元素溢出 */
+        [style*="position: absolute"],
+        [style*="position:absolute"] {
+            max-width: 100vw;
+        }
+    </style>
     <script>
         (function () {
             var IEvar = '9';
@@ -43,6 +191,50 @@
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <script src="js/main.js"></script>
     <script src="js/particles.min.js"></script>
+    <script>
+        // 确保移动菜单正确工作
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuButton = document.querySelector('#mobileMenuButton');
+            const mobileMenu = document.querySelector('#mobile-menu');
+            
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener('click', function() {
+                    if (mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.remove('hidden');
+                    } else {
+                        mobileMenu.classList.add('hidden');
+                    }
+                });
+            }
+            
+            // 修复AOS可能导致的横向滚动
+            if (window.AOS) {
+                AOS.init({
+                    duration: 800,
+                    once: true,
+                    disable: 'mobile',
+                    offset: 200
+                });
+            }
+            
+            // 确保粒子系统不溢出
+            if (window.particlesJS) {
+                const particlesContainer = document.getElementById('particles-js');
+                if (particlesContainer) {
+                    particlesContainer.style.width = '100%';
+                    particlesContainer.style.height = '100%';
+                    particlesContainer.style.overflow = 'hidden';
+                }
+            }
+            
+            // 阻止任何可能导致横向滚动的事件
+            document.body.addEventListener('scroll', function(e) {
+                if (window.innerWidth < document.body.scrollWidth) {
+                    document.body.style.overflowX = 'hidden';
+                }
+            });
+        });
+    </script>
 </head>
 <body>
     <!-- 现代化导航栏 -->
@@ -56,10 +248,30 @@
                 <a href="#about">关于我们</a>
                 <a href="#services">安全服务</a>
                 <a href="#opensource">开源项目</a>
+                <a href="AI/PromptJailbreakManual.html">Prompt越狱手册</a>
+                <a href="AI/AiMythBook.html">AI应用与安全指南</a>
                 <a href="mailto:admin@hi-ourlife.com" class="contact-btn">联系我们</a>
             </div>
+            <button id="mobileMenuButton" class="md:hidden p-2 rounded-md text-gray-600 hover:text-blue-500 focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
         </div>
     </nav>
+
+    <!-- Mobile menu -->
+    <div id="mobile-menu" class="hidden md:hidden" style="background-color: var(--card-color);">
+        <div class="container mx-auto px-4 py-3 space-y-2">
+            <a href="#intro" class="block py-2 nav-item">绪论</a>
+            <a href="#learning-path" class="block py-2 nav-item">学习路径</a>
+            <a href="#llm-overview" class="block py-2 nav-item">大模型概览</a>
+            <a href="#security" class="block py-2 nav-item">安全工程</a>
+            <a href="#legal" class="block py-2 nav-item">法律法规</a>
+            <a href="AI/PromptJailbreakManual.html" class="block py-2 nav-item">Prompt越狱手册</a>
+            <a href="AI/AiMythBook.html" class="block py-2 nav-item">AI应用与安全指南</a>
+        </div>
+    </div>
 
     <!-- 现代化Hero区域 -->
     <section class="hero">
@@ -191,7 +403,7 @@
             <div class="project-card">
                 <div class="project-icon">
                     <svg class="icon-ai" viewBox="0 0 24 24">
-                        <path d="M21 11.5v-1c0-.8-.7-1.5-1.5-1.5H16v-3c0-.8-.7-1.5-1.5-1.5h-9C4.7 4.5 4 5.2 4 6v12c0 .8.7 1.5 1.5 1.5h9c.8 0 1.5-.7 1.5-1.5v-3h3.5c.8 0 1.5-.7 1.5-1.5v-1h-1v1c0 .3-.2.5-.5.5H16v-2h3.5c.3 0 .5.2.5.5v1h1z" fill="currentColor"/>
+                        <path d="M21 11.5v-1c0-.8-.7-1.5-1.5-1.5H16v-3c0-.8-.7-1.5-1.5-1.5h-9C4.7 4.5 4 5.2 4 6v12c0 .8.7 1.5 1.5 1.5 1.5h9c.8 0 1.5-.7 1.5-1.5v-3h3.5c.8 0 1.5-.7 1.5-1.5v-1h-1v1c0 .3-.2.5-.5.5H16v-2h3.5c.3 0 .5.2.5.5v1h1z" fill="currentColor"/>
                     </svg>
                 </div>
                 <h3><a href="https://github.com/Acmesec/PromptJailbreakManual" target="_blank">Prompt越狱手册</a></h3>
@@ -275,6 +487,33 @@
         AOS.init({
             duration: 800,
             once: true
+        });
+        
+        // 监测并修复可能导致横向滚动的元素
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const viewportWidth = window.innerWidth;
+                
+                // 检查所有元素的宽度
+                const allElements = document.querySelectorAll('*');
+                allElements.forEach(function(el) {
+                    const rect = el.getBoundingClientRect();
+                    // 如果元素宽度超过视口
+                    if (rect.width > viewportWidth) {
+                        el.style.maxWidth = '100vw';
+                        el.style.overflowX = 'hidden';
+                    }
+                    // 如果元素位置导致横向滚动
+                    if (rect.right > viewportWidth || rect.left < 0) {
+                        el.style.maxWidth = '100vw';
+                        el.style.overflowX = 'hidden';
+                    }
+                });
+                
+                // 强制设置文档最大宽度
+                document.documentElement.style.maxWidth = '100vw';
+                document.body.style.maxWidth = '100vw';
+            }, 500);
         });
     </script>
 </body>
